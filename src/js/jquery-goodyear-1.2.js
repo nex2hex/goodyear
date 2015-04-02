@@ -3,140 +3,95 @@
  * Timur Arefev (http://timurarefev.ru), Ilya Birman (http://ilyabirman.ru)
  * 2014
  */
- 
-(function($){
-	jQuery.fn.goodyear = function(options){
 
-		var init = function (elements, options) {
-			$(elements).each(function () {
-				init_single(this, options);
-			});
-		};
-    		
-        var init_single = function(element, options){
+(function($, moment, window){
+'use strict';
+jQuery.fn.goodyear = function(options){
+
+	var init = function (elements, options) {
+		$(elements).each(function () {
+			init_single(this, options);
+		});
+	};
+
+	var init_single = function(element, options){
         
         var goodyear_input = $(element);
         
         var found_goodyear_id = 0;
+        if (typeof(window.activated_goodyears_list) !== "undefined") {
+	        $.each(window.activated_goodyears_list, function (index, value) {
+		        if (value.element === goodyear_input) {
+			        found_goodyear_id = index;
+		        }
+	        });
+        }
         
-        if (typeof(activated_goodyears_list) != "undefined")
-        $.each(activated_goodyears_list, function(index, value){
-            
-            if (value.element == goodyear_input)
-            {
-                found_goodyear_id = index;
-            };
-            
-        });
-        
-        if (found_goodyear_id)
-        {
+        if (found_goodyear_id) {
             /*
             if (typeof(options) != "undefined" && typeof(options.method) != "undefined")
             {
-            
                 switch (options.method)
                 {
-            
                     case "set_min_date":
-                    
-                      
                         activated_goodyears_list[found_goodyear_id].options.min_date = options.min_date;
-                      
                         activated_goodyears_list[found_goodyear_id].options.min_year = parseInt(options.min_date.format("YYYY"), 10);
-                      
                         activated_goodyears_list[found_goodyear_id].methods["set_date"];
-                        
                     break;
                     
                     case "set_max_date":
-                    
-                      
                         activated_goodyears_list[found_goodyear_id].options.max_date = options.max_date;
-                      
                         activated_goodyears_list[found_goodyear_id].options.max_year = parseInt(options.max_date.format("YYYY"), 10);
-                      
                         activated_goodyears_list[found_goodyear_id].methods["set_date"];
-                        
                     break;
-                
-                };            
-                
-            
+                };
             };           
             */
-        
-        } else
-        {
-        
-            var options = $.extend({
-    		
+        } else {
+            options = $.extend({
         		format : "YYYY-MM-DD",
-        		
         		visible_format : "D MMMM YYYY г.",
-        		
-        		minutes_step : 5			
-    		
+        		minutes_step : 5
             }, options);
-        	  	
-        	var block_model = {
-        		
-        		single_date_item_width : 25,
-        		
-        		single_date_item_height : 21,
-        		
-        		year_block_height : 269,
-        		
-        		year_selection_top : 119,
-        		
-        		year_selection_border_top : 1,
-        		
-        		single_year_item_height : 32,
-        		
-        		month_block_height : 240,
-        		
-        		month_slider_height : 43,
-        		
-        		month_slider_top_manual_correction : 1,
-        		
-        		single_month_item_height : 20,
-        		
-        		date_block_height : 267,
-        		
-        		date_block_month_block_padding_top : 5,
-        		
-        		date_block_month_block_padding_bottom : 5,
-        		
-        		date_block_label_height : 21,
-        		
-        		date_block_label_border_bottom : 1,
-        		
-        		range_from_text_block_to_picker : 3,
-        		
-        		picker_open : null		
-        		
-            };
+
+	        var block_model = {
+		        single_date_item_width: 25,
+		        single_date_item_height: 21,
+		        year_block_height: 269,
+		        year_selection_top: 119,
+		        year_selection_border_top: 1,
+		        single_year_item_height: 32,
+		        month_block_height: 240,
+		        month_slider_height: 43,
+		        month_slider_top_manual_correction: 1,
+		        single_month_item_height: 20,
+		        date_block_height: 267,
+		        date_block_month_block_padding_top: 5,
+		        date_block_month_block_padding_bottom: 5,
+		        date_block_label_height: 21,
+		        date_block_label_border_bottom: 1,
+		        range_from_text_block_to_picker: 3,
+		        picker_open: null
+	        };
         	
         	var templates = {
-        		
-        		container : function(){			
-        		
-        			return "\
+		        container: function () {
+			        return "\
         			<div class='goodyear-container'>\
         			<div class='goodyear-icon'></div>\
-        			<div class='goodyear-picker"+(options.hour_picker ? " goodyear-add-hour-picker" : "") + (options.minute_picker ? " goodyear-add-minute-picker" : "")+"'>\
+        			<div class='goodyear-picker" + (options.hour_picker ? " goodyear-add-hour-picker" : "") + (options.minute_picker ? " goodyear-add-minute-picker" : "") + "'>\
         				<div class='goodyear-date-picker'>\
         					<div class='goodyear-slider'>\
-        						"+templates.days()+"\
+        						" + templates.days() + "\
         					</div>\
         				</div>\
         				<div class='goodyear-month-picker'>\
         					<div class='goodyear-months'>\
-        						"+templates.months()+"\
+        						" + templates.months() + "\
         					</div>\
         					<div class='goodyear-slider'>\
         						<div class='goodyear-months'>\
-        							"+templates.months()+"\
+        							" + templates.months() + "\
         						</div>\
         					</div>\
         				</div>\
@@ -153,12 +108,12 @@
         				<div class='goodyear-year-picker'>\
         					<div class='goodyear-years'>\
         						<div class='goodyear-years-floating-block'>\
-        							"+templates.years()+"\
+        							" + templates.years() + "\
         						</div>\
         					</div>\
         					<div class='goodyear-current-year-selection'>\
         						<div class='goodyear-years-floating-block'>\
-        							"+templates.years()+"\
+        							" + templates.years() + "\
         						</div>\
         					</div>\
         				</div>\
@@ -166,12 +121,12 @@
                         <div class='goodyear-hour-picker'>\
         					<div class='goodyear-hours'>\
         						<div class='goodyear-hours-floating-block'>\
-        							"+templates.hours()+"\
+        							" + templates.hours() + "\
         						</div>\
         					</div>\
         					<div class='goodyear-current-hour-selection'>\
         						<div class='goodyear-hours-floating-block'>\
-        							"+templates.hours()+"\
+        							" + templates.hours() + "\
         						</div>\
         					</div>\
         				</div>\
@@ -180,13 +135,13 @@
                             " + (options.minute_picker ? "\
         					<div class='goodyear-minutes'>\
         						<div class='goodyear-minutes-floating-block'>\
-        							"+templates.minutes()+"\
+        							" + templates.minutes() + "\
         						</div>\
         					</div>\
                             " : "") + "\
         					<div class='goodyear-current-minute-selection'>\
         						<div class='goodyear-minutes-floating-block'>\
-        							"+(options.minute_picker ? templates.minutes() : "<div class='goodyear-minute'><span>00</span></div>")+"\
+        							" + (options.minute_picker ? templates.minutes() : "<div class='goodyear-minute'><span>00</span></div>") + "\
         						</div>\
         					</div>\
         				</div>\
@@ -195,96 +150,70 @@
                         </div>\
                         " : "") + "\
         			</div>\
-        			</div>";			
-        		},
-                
-                hours : function(){
-        			
-        			var text = "";
-        			
-        			for (i = 0; i < 24; i++)
-        			{
-        				text += "<div class='goodyear-hour'><span>" + (i < 10 ? "0" : "") + i + "</span></div>";
-        			};
-        			
-        			return text;
-        		},
-                
-                minutes : function(){
-        			
-        			var text = "";
-        			
-        			for (i = 0; i < 60; i = i + options.minutes_step)
-        			{
-        				text += "<div class='goodyear-minute'><span>" + (i < 10 ? "0" : "") + i + "</span></div>";
-        			};
-        			
-        			return text;
-        		},
-        		
-        		years : function(min_year, max_year){
-        			
-        			var text = "";
-        			
-        			for (i = options.min_year; i <= options.max_year; i++)
-        			{
-        				text += "<div class='goodyear-year" + (states.today.format("YYYY") == i ? " today" : "") + "'><span>" + i + (states.today.format("YYYY") == i ? " &bull;" : "") + "</span></div>";
-        			};
-        			
-        			return text;
-        		},
-        		
-        		months : function(){
-        			
-        			var text = "";  
-        		  
-        			for (month_num = 0; month_num < 12; month_num++)
-        			{	
-        						  
-        			  text += "<div class='goodyear-month goodyear-"+presets.months_en[month_num] + (states.today.format("M") == (month_num + 1) ? " today" : "") + "'>"+presets.months_ru_short[month_num] + (states.today.format("M") == (month_num + 1) ? "<span class='bull'> &bull;</span>" : "") + "</div>";
-        			  
-        			};
-        			
-        			return text;
-        			
-        		},
-        		
-        		days : function(){
-        
-        			var text = "";  
-        			  
-        			for (var month_num = 0; month_num < 12; month_num++)
-        			{	
-        				
-        				var month_first_date = moment(states.selected_date.format("YYYY") + "-" + (month_num + 1) + "-01", "YYYY-M-DD");
-        			
-        				var day_of_week = month_first_date.format("e");
-        				
-        				var days_count = month_first_date.add("months", 1).subtract("days", 1).format("D");
-        				
-        				var shifted = (day_of_week > 2 ? 9 : 2) - day_of_week;
-        
-        				var line_1_weekdays_shift = (9 - shifted)*block_model.single_date_item_width;		  
-        				var line_1_weekend_shift = (4 - shifted)*block_model.single_date_item_width;
-        				
-        				var line_2_weekdays_shift = (2 - shifted)*block_model.single_date_item_width;		  
-        				var line_2_weekend_shift = (0 - shifted)*block_model.single_date_item_width;
-        				
-        				var line_all_weekdays_shift = (0 - shifted)*block_model.single_date_item_width;		  
-        				var line_all_weekend_shift = (0 - shifted)*block_model.single_date_item_width;		
-        			  
-        				text += "\
-        				<div class='goodyear-month goodyear-"+presets.months_en[month_num]+"' data-month-id='"+month_num+"'>\
+        			</div>";
+		        },
+
+		        hours: function () {
+			        var text = "";
+			        for (var i = 0; i < 24; i++) {
+				        text += "<div class='goodyear-hour'><span>" + (i < 10 ? "0" : "") + i + "</span></div>";
+			        }
+			        return text;
+		        },
+
+		        minutes: function () {
+			        var text = "";
+			        for (var i = 0; i < 60; i = i + options.minutes_step) {
+				        text += "<div class='goodyear-minute'><span>" + (i < 10 ? "0" : "") + i + "</span></div>";
+			        }
+			        return text;
+		        },
+
+		        years: function (min_year, max_year) {
+			        var text = "";
+			        for (var i = options.min_year; i <= options.max_year; i++) {
+				        text += "<div class='goodyear-year" + (states.today.format("YYYY") === i ? " today" : "") + "'><span>" +
+				            i + (states.today.format("YYYY") === i ? " &bull;" : "") + "</span></div>";
+			        }
+			        return text;
+		        },
+
+		        months: function () {
+			        var text = "";
+			        for (var month_num = 0; month_num < 12; month_num++) {
+				        text += "<div class='goodyear-month goodyear-" + presets.months_en[month_num] + (states.today.format("M") === (month_num + 1) ? " today" : "") + "'>" +
+				            presets.months_ru_short[month_num] + (states.today.format("M") === (month_num + 1) ? "<span class='bull'> &bull;</span>" : "") + "</div>";
+			        }
+			        return text;
+
+		        },
+
+		        days: function () {
+			        var text = "";
+			        for (var month_num = 0; month_num < 12; month_num++) {
+				        var month_first_date = moment(states.selected_date.format("YYYY") + "-" + (month_num + 1) + "-01", "YYYY-M-DD");
+				        var day_of_week = month_first_date.format("e");
+				        var days_count = month_first_date.add("months", 1).subtract("days", 1).format("D");
+				        var shifted = (day_of_week > 2 ? 9 : 2) - day_of_week;
+				        var line_1_weekdays_shift = (9 - shifted) * block_model.single_date_item_width;
+				        var line_1_weekend_shift = (4 - shifted) * block_model.single_date_item_width;
+				        var line_2_weekdays_shift = (2 - shifted) * block_model.single_date_item_width;
+				        var line_2_weekend_shift = (0 - shifted) * block_model.single_date_item_width;
+				        var line_all_weekdays_shift = (0 - shifted) * block_model.single_date_item_width;
+				        var line_all_weekend_shift = (0 - shifted) * block_model.single_date_item_width;
+
+				        text += "\
+        				<div class='goodyear-month goodyear-" + presets.months_en[month_num] + "' data-month-id='" + month_num + "'>\
         					<div class='goodyear-label'>" + presets.months_ru[month_num].substr(0, 1).toUpperCase() + presets.months_ru[month_num].substr(1) + "</div>\
         					<div class='goodyear-line_1'>\
         						<div class='goodyear-weekdays'>\
-        							<div class='goodyear-slide_line' style='left:"+line_1_weekdays_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_1_weekdays_shift + "px;'>\
         								<span date='1'>1</span>\
         								<span date='2'>2</span>\
         							</div>\
         						</div>\
         						<div class='goodyear-weekend'>\
-        							<div class='goodyear-slide_line' style='left:"+line_1_weekend_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_1_weekend_shift + "px;'>\
         								<span date='1'>1</span>\
         								<span date='2'>2</span>\
         								<span date='3'>3</span>\
@@ -294,7 +223,7 @@
         					</div>\
         					<div class='goodyear-line_2'>\
         						<div class='goodyear-weekdays'>\
-        							<div class='goodyear-slide_line' style='left:"+line_2_weekdays_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_2_weekdays_shift + "px;'>\
         								<span date='1'>1</span>\
         								<span date='2'>2</span>\
         								<span date='3'>3</span>\
@@ -307,7 +236,7 @@
         							</div>\
         						</div>\
         						<div class='goodyear-weekend'>\
-        							<div class='goodyear-slide_line' style='left:"+line_2_weekend_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_2_weekend_shift + "px;'>\
         								<span date='4'>4</span>\
         								<span date='5'>5</span>\
         								<span date='6'>6</span>\
@@ -321,7 +250,7 @@
         					</div>\
         					<div class='goodyear-line_3'>\
         						<div class='goodyear-weekdays'>\
-        							<div class='goodyear-slide_line' style='left:"+line_all_weekdays_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_all_weekdays_shift + "px;'>\
         								<span date='6'>6</span>\
         								<span date='7'>7</span>\
         								<span date='8'>8</span>\
@@ -336,7 +265,7 @@
         							</div>\
         						</div>\
         						<div class='goodyear-weekend'>\
-        							<div class='goodyear-slide_line' style='left:"+line_all_weekend_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_all_weekend_shift + "px;'>\
         								<span date='11'>11</span>\
         								<span date='12'>12</span>\
         								<span date='13'>13</span>\
@@ -350,7 +279,7 @@
         					</div>\
         					<div class='goodyear-line_4'>\
         						<div class='goodyear-weekdays'>\
-        							<div class='goodyear-slide_line' style='left:"+line_all_weekdays_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_all_weekdays_shift + "px;'>\
         								<span date='13'>13</span>\
         								<span date='14'>14</span>\
         								<span date='15'>15</span>\
@@ -365,7 +294,7 @@
         							</div>\
         						</div>\
         						<div class='goodyear-weekend'>\
-        							<div class='goodyear-slide_line' style='left:"+line_all_weekend_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_all_weekend_shift + "px;'>\
         								<span date='18'>18</span>\
         								<span date='19'>19</span>\
         								<span date='20'>20</span>\
@@ -379,7 +308,7 @@
         					</div>\
         					<div class='goodyear-line_5'>\
         						<div class='goodyear-weekdays'>\
-        							<div class='goodyear-slide_line' style='left:"+line_all_weekdays_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_all_weekdays_shift + "px;'>\
         								<span date='20'>20</span>\
         								<span date='21'>21</span>\
         								<span date='22'>22</span>\
@@ -389,41 +318,38 @@
         								<span date='26'>26</span>\
         								<span date='27'>27</span>\
         								<span date='28'>28</span>\
-        								<span date='29' "+(days_count < 29 ? "style='display:none'" : "")+">29</span>\
-        								<span date='30' "+(days_count < 30 ? "style='display:none'" : "")+">30</span>\
+        								<span date='29' " + (days_count < 29 ? "style='display:none'" : "") + ">29</span>\
+        								<span date='30' " + (days_count < 30 ? "style='display:none'" : "") + ">30</span>\
         							</div>\
         						</div>\
         						<div class='goodyear-weekend'>\
-        							<div class='goodyear-slide_line' style='left:"+line_all_weekend_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_all_weekend_shift + "px;'>\
         								<span date='25'>25</span>\
         								<span date='26'>26</span>\
         								<span date='27'>27</span>\
         								<span date='28'>28</span>\
-        								<span date='29' "+(days_count < 29 ? "style='display:none'" : "")+">29</span>\
-        								<span date='30' "+(days_count < 30 ? "style='display:none'" : "")+">30</span>\
-        								<span date='31' "+(days_count < 31 ? "style='display:none'" : "")+">31</span>\
+        								<span date='29' " + (days_count < 29 ? "style='display:none'" : "") + ">29</span>\
+        								<span date='30' " + (days_count < 30 ? "style='display:none'" : "") + ">30</span>\
+        								<span date='31' " + (days_count < 31 ? "style='display:none'" : "") + ">31</span>\
         							</div>\
         						</div>\
         					</div>\
         					<div class='goodyear-line_6'>\
         						<div class='goodyear-weekdays'>\
-        							<div class='goodyear-slide_line' style='left:"+line_all_weekdays_shift+"px;'>\
+        							<div class='goodyear-slide_line' style='left:" + line_all_weekdays_shift + "px;'>\
         								<span date='27'>27</span>\
         								<span date='28'>28</span>\
-        								<span date='29' "+(days_count < 29 ? "style='display:none'" : "")+">29</span>\
-        								<span date='30' "+(days_count < 30 ? "style='display:none'" : "")+">30</span>\
-        								<span date='31' "+(days_count < 31 ? "style='display:none'" : "")+">31</span>\
+        								<span date='29' " + (days_count < 29 ? "style='display:none'" : "") + ">29</span>\
+        								<span date='30' " + (days_count < 30 ? "style='display:none'" : "") + ">30</span>\
+        								<span date='31' " + (days_count < 31 ? "style='display:none'" : "") + ">31</span>\
         							</div>\
         						</div>\
         					</div>\
         				</div>";
-        			};	
-        			
-        			return text;		
-        			
-        		}
-        		
-        	
+			        }
+
+			        return text;
+		        }
         	};
         	
         	var presets = {
@@ -454,243 +380,226 @@
         	};
         	
         	var methods = {
-                
-        		wrap_element : function(element){
-                    
-        			var container_template = $(templates.container()).clone();
-                    
-        			switch ($(element).css("box-sizing"))
-        			{			
-        				case "border-box" :
-        					container_template.css("width", $(element).css("width"));
-        				break;
-        				
-        				case "content-box" :
-        					container_template.css("width", 
-        							parseFloat($(element).width())
-        							+ parseFloat($(element).css("padding-left"))
-        							+ parseFloat($(element).css("padding-right"))
-        							+ parseFloat($(element).css("border-left-width"))
-        							+ parseFloat($(element).css("border-right-width")));
-        					
-        					$(element).css("height", parseFloat($(element).height())
-        							+ parseFloat($(element).css("padding-top"))
-        							+ parseFloat($(element).css("padding-bottom"))
-        							+ parseFloat($(element).css("border-top-width"))
-        							+ parseFloat($(element).css("border-bottom-width")));
-        				break;
-        				
-        				case "padding-box" :
-        					container_template.css("width", 
-        							parseFloat($(element).width())
-        							+ parseFloat($(element).css("border-left-width"))
-        							+ parseFloat($(element).css("border-right-width")));
-        					
-        					$(element).css("height", parseFloat($(element).height())
-        							+ parseFloat($(element).css("border-top-width"))
-        							+ parseFloat($(element).css("border-bottom-width")));
-        				break;			
-        			}
-        			
-        			element.wrapAll(container_template);	
-        			
-        			var visible_element = element.clone();
-        			
-        			element.removeClass("goodyear").addClass("goodyear-hidden-text");
-        			
-        			states.container = element.parent();
-        			
-        			visible_element.removeAttr("name").removeClass("goodyear").addClass("goodyear-text");
-        			
-        			visible_element.prependTo(states.container);
-        			
-        			states.container.find(".goodyear-text").val(states.input_text_value);
-        			
-        			states.container.find(".goodyear-hidden-text").val(states.input_hidden_text_value);
-        			
-        			if (states.input_text_value == states.selected_date.format(options.visible_format))
-        			{
-        				states.container.removeClass("goodyear-error");
-        				
-        				states.input_text_error = false;
-        				
-        			} else
-        			{
-        				if (states.input_text_value)
-        				{
-        					states.container.addClass("goodyear-error");
-        				
-        					states.input_text_error = true;
-        				};
-        			};
-        			
-        			var is_mobile = new RegExp('mobile|android', "i");
-        			
-        			states.is_mobile = is_mobile.test(navigator.userAgent);
-        						
-        			/*
-        				Устанавливаем позиции в календаре в соответствии с выбранной датой
-        			*/
-        			
-        			methods.set_date();
-        
-        			/*
-        				Наведение на input
-        			*/
-        			
-        			methods.input_icon_hover();
-        			
-        			/*
-        				Активируем возможность открыть и закрыть выбор даты
-        			*/
-        			
-        			if (!states.is_mobile)
-        			{
-        			
-        				methods.show_and_hide_picker();
-        		  	
-        			};
-        			
-        			/*
-        				Форматирование даты при уводе фокуса
-        			*/
-        			
-        			methods.set_date_on_blur();
-        		  
-        			/*
-        				Подсветка месяца при наведении
-        			*/
-        		  
-        			methods.months_hover();
-        
-        		    /*
-        				Клик по месяцу
-        		    */
-        		  
-        		  	methods.months_click();
-        		  
-        			/*
-        				Прокрутка месяца перетягиванием
-        			*/
-        		  
-        		 	methods.months_drag();
-        		  
-        			/*
-        				Прокрутка месяцев
-        			*/
-        		  
-        			methods.months_mousewheel();
-        			
-        			/*
-        				Прокрутка месяцев тачем
-        			*/
-        		  
-        			//methods.months_touch();
-        		  
-        			/*
-        				Подсветка года при наведении
-        			*/
-        			
-        			methods.year_mouseenter();
-        		  
-        			/*
-        				Клик по году
-        			*/
-        		  
-        			methods.year_click();
-        		  
-        			/*
-        				Перетягивание года
-        			*/
-        		  
-        			methods.year_drag();
-        			
-        			/*
-        				Перетягивание года
-        			*/
-        		  
-        			//methods.year_touch();
-        		  
-        			/*
-        				Прокрутка года мышью
-        			*/
-        		  
-        			methods.year_mousewheel();
-                    
-        			if (options.hour_picker)
-        			{
-        			
-	                    /*
-	        				Подсветка часа при наведении
-	        			*/
-	        			
-	        			methods.hour_mouseenter();
-	                    
-	                    /*
-	        				Клик по часу
-	        			*/
-	        		  
-	        			methods.hour_click();
-	                    
-	                    /*
-	        				Перетягивание часа
-	        			*/
-	        		  
-	        			methods.hour_drag();
-	                    
-	                    /*
-	        				Прокрутка часа мышью
-	        			*/
-	        		  
-	        			methods.hour_mousewheel();
-	        			
-	        			if (options.minute_picker)
-	        			{
-	        			
-		                    /*
-		        				Подсветка минуты при наведении
-		        			*/
-		        			
-		        			methods.minute_mouseenter();
-		                    
-		                    /*
-		        				Клик по минуте
-		        			*/
-		        		  
-		        			methods.minute_click();
-		                    
-		                    /*
-		        				Перетягивание минуты
-		        			*/
-		        		  
-		        			methods.minute_drag();
-		                    
-		                    /*
-		        				Прокрутка часа мышью
-		        			*/
-		        		  
-		        			methods.minute_mousewheel();
-	        			
-	        			};
-	        		
-        			};
-	        			
-        			/*
-        				Подсветка даты при наведении
-        			*/
-                  
-        			methods.date_hover();
-                    
-        		  
-        			/*
-        				Выбор даты
-        			*/
-        		  
-        			methods.date_pick();
-                    
-                    return element;
-        			
-        		},
+
+		        wrap_element: function (element) {
+
+			        var container_template = $(templates.container()).clone();
+
+			        switch ($(element).css("box-sizing")) {
+				        case "border-box" :
+					        container_template.css("width", $(element).css("width"));
+					        break;
+
+				        case "content-box" :
+					        container_template.css("width",
+						        parseFloat($(element).width()) +
+						        parseFloat($(element).css("padding-left")) +
+						        parseFloat($(element).css("padding-right")) +
+						        parseFloat($(element).css("border-left-width")) +
+						        parseFloat($(element).css("border-right-width")));
+
+					        $(element).css("height", parseFloat($(element).height()) +
+					        parseFloat($(element).css("padding-top")) +
+					        parseFloat($(element).css("padding-bottom")) +
+					        parseFloat($(element).css("border-top-width")) +
+					        parseFloat($(element).css("border-bottom-width")));
+					        break;
+
+				        case "padding-box" :
+					        container_template.css("width",
+						        parseFloat($(element).width()) +
+						        parseFloat($(element).css("border-left-width")) +
+						        parseFloat($(element).css("border-right-width")));
+
+					        $(element).css("height", parseFloat($(element).height()) +
+					        parseFloat($(element).css("border-top-width")) +
+					        parseFloat($(element).css("border-bottom-width")));
+					        break;
+			        }
+
+			        element.wrapAll(container_template);
+			        var visible_element = element.clone();
+			        element.removeClass("goodyear").addClass("goodyear-hidden-text");
+			        states.container = element.parent();
+			        visible_element.removeAttr("name").removeClass("goodyear").addClass("goodyear-text");
+			        visible_element.prependTo(states.container);
+			        states.container.find(".goodyear-text").val(states.input_text_value);
+			        states.container.find(".goodyear-hidden-text").val(states.input_hidden_text_value);
+
+			        if (states.input_text_value === states.selected_date.format(options.visible_format)) {
+				        states.container.removeClass("goodyear-error");
+				        states.input_text_error = false;
+			        } else {
+				        if (states.input_text_value) {
+					        states.container.addClass("goodyear-error");
+					        states.input_text_error = true;
+				        }
+			        }
+
+			        var is_mobile = new RegExp('mobile|android', "i");
+			        states.is_mobile = is_mobile.test(navigator.userAgent);
+			        /*
+			         Устанавливаем позиции в календаре в соответствии с выбранной датой
+			         */
+
+			        methods.set_date();
+
+			        /*
+			         Наведение на input
+			         */
+
+			        methods.input_icon_hover();
+
+			        /*
+			         Активируем возможность открыть и закрыть выбор даты
+			         */
+
+			        if (!states.is_mobile) {
+
+				        methods.show_and_hide_picker();
+
+			        }
+
+			        /*
+			         Форматирование даты при уводе фокуса
+			         */
+
+			        methods.set_date_on_blur();
+
+			        /*
+			         Подсветка месяца при наведении
+			         */
+
+			        methods.months_hover();
+
+			        /*
+			         Клик по месяцу
+			         */
+
+			        methods.months_click();
+
+			        /*
+			         Прокрутка месяца перетягиванием
+			         */
+
+			        methods.months_drag();
+
+			        /*
+			         Прокрутка месяцев
+			         */
+
+			        methods.months_mousewheel();
+
+			        /*
+			         Прокрутка месяцев тачем
+			         */
+
+			        //methods.months_touch();
+
+			        /*
+			         Подсветка года при наведении
+			         */
+
+			        methods.year_mouseenter();
+
+			        /*
+			         Клик по году
+			         */
+
+			        methods.year_click();
+
+			        /*
+			         Перетягивание года
+			         */
+
+			        methods.year_drag();
+
+			        /*
+			         Перетягивание года
+			         */
+
+			        //methods.year_touch();
+
+			        /*
+			         Прокрутка года мышью
+			         */
+
+			        methods.year_mousewheel();
+
+			        if (options.hour_picker) {
+
+				        /*
+				         Подсветка часа при наведении
+				         */
+
+				        methods.hour_mouseenter();
+
+				        /*
+				         Клик по часу
+				         */
+
+				        methods.hour_click();
+
+				        /*
+				         Перетягивание часа
+				         */
+
+				        methods.hour_drag();
+
+				        /*
+				         Прокрутка часа мышью
+				         */
+
+				        methods.hour_mousewheel();
+
+				        if (options.minute_picker) {
+
+					        /*
+					         Подсветка минуты при наведении
+					         */
+
+					        methods.minute_mouseenter();
+
+					        /*
+					         Клик по минуте
+					         */
+
+					        methods.minute_click();
+
+					        /*
+					         Перетягивание минуты
+					         */
+
+					        methods.minute_drag();
+
+					        /*
+					         Прокрутка часа мышью
+					         */
+
+					        methods.minute_mousewheel();
+
+				        }
+				        ;
+
+			        }
+			        ;
+
+			        /*
+			         Подсветка даты при наведении
+			         */
+
+			        methods.date_hover();
+
+
+			        /*
+			         Выбор даты
+			         */
+
+			        methods.date_pick();
+
+			        return element;
+
+		        },
         		
         		document_actions : function(){
         		  
@@ -3039,7 +2948,7 @@
         return init(this, options);
         
   };
-})(jQuery, window);
+})(jQuery, moment, window);
 
 $(document).ready(function () {
 	'use strict';
