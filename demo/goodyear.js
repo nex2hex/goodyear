@@ -1,33 +1,19 @@
-﻿/*
+/*
  * Goodyear 1.2
  * Timur Arefev (http://timurarefev.ru), Ilya Birman (http://ilyabirman.ru)
  * 2014
  */
  
 (function($){
-  jQuery.fn.goodyear = function(options){
-    
-    var init = function(element, options){
-        
-        if ($(element).length > 1)
-        {
-            
-          $(element).each(function(){
-            
-            init_single(this, options);
-            
-          });
-            
-        } else
-        {
-          
-          init_single(element, options);
-            
-        };
-        
-    };
+	jQuery.fn.goodyear = function(options){
+
+		var init = function (elements, options) {
+			$(elements).each(function () {
+				init_single(this, options);
+			});
+		};
     		
-    var init_single = function(element, options){
+        var init_single = function(element, options){
         
         var goodyear_input = $(element);
         
@@ -267,7 +253,7 @@
         
         			var text = "";  
         			  
-        			for (month_num = 0; month_num < 12; month_num++)
+        			for (var month_num = 0; month_num < 12; month_num++)
         			{	
         				
         				var month_first_date = moment(states.selected_date.format("YYYY") + "-" + (month_num + 1) + "-01", "YYYY-M-DD");
@@ -1355,7 +1341,7 @@
         							
         							month_slider_top = 0;
         						
-        						};
+        						}
         						
         						if (month_slider_top > (block_model.month_block_height - block_model.month_slider_height))
         						{
@@ -1365,7 +1351,7 @@
         							month_slider_top = (block_model.month_block_height - block_model.month_slider_height);
         							
         							
-        						};
+        						}
         						
         						date_slider_month_slider_top = month_slider_top;						
         						
@@ -2731,15 +2717,15 @@
         		
         		string_to_date : function(string){
         			
-                    for (i = 0; i < presets.common_date_langs.length; i++)
+                    for (var i = 0; i < presets.common_date_langs.length; i++)
         			{
                         var parsed_date = moment(methods.trim(string), options.format, presets.common_date_langs[i], true);
                         
                         if (parsed_date.isValid())
             			{
         	                break;
-            			};
-                    };
+            			}
+                    }
                     
                     for (i = 0; i < presets.common_date_langs.length; i++)
         			{
@@ -2748,13 +2734,13 @@
                         if (parsed_date.isValid())
             			{
         	                break;
-            			};
-                    };
+            			}
+                    }
                     
                     if (!parsed_date.isValid())
                     {
                         
-            			for (k = 0; k < presets.common_date_formats.length; k++)
+            			for (var k = 0; k < presets.common_date_formats.length; k++)
             			{
             				for (i = 0; i < presets.common_date_langs.length; i++)
             				{
@@ -2763,25 +2749,19 @@
             					if (parsed_date.isValid())
             					{
             						break;
-            					};
-            				};
+            					}
+            				}
             				
             				if (parsed_date.isValid())
             				{
             					break;
-            				};
-            			};
+            				}
+            			}
                         
-                    };
-        			
-        			if (parsed_date.isValid())
-        			{
-        				return parsed_date;
-        			} else
-        			{
-        				return false;
-        			};
-        			
+                    }
+
+
+			        return parsed_date.isValid() ? parsed_date : false;
         		}
         		
         	};
@@ -3056,44 +3036,13 @@
       
     };
  
-    return init(this, options);
+        return init(this, options);
         
   };
-})(jQuery);
+})(jQuery, window);
 
-$(document).ready(function(){
-    
-	var is_goodyear_script = new RegExp('^.*?goodyear[^/]*?$', "i");
-	
-	var find_script_path = new RegExp('^(.*?)[^/]*?$', "i");
-	
-	var script_path = false;
-    
-    var script_block = false;
-    
-	$("script").filter("[src*='goodyear']").each(function(){
-		
-		if (is_goodyear_script.test($(this).attr("src")))
-		{
-			script_path = find_script_path.exec($(this).attr("src"))[1];
-            
-            script_block = $(this);
-		};
-		
-	});
-	
-	if (script_path)
-	if (typeof(moment) == "undefined")
-	{		
-		$("<script src='"+script_path + "moment-with-langs.min.js'></script>").insertAfter(script_block);	
-	}; 
-    
-	if (script_path)
-	if (!jQuery().mousewheel)
-	{	
-		$("<script src='"+script_path + "jquery-mousewheel-3.1.11.min.js'></script>").insertAfter(script_block);	
-	};
-		
+$(document).ready(function () {
+	'use strict';
+
 	$(".goodyear").goodyear();
-		
 });

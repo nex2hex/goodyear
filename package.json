@@ -1,0 +1,11 @@
+{
+  "name": "goodyear",
+  "version": "1.2.0",
+  "description": "goodyear",
+  "devDependencies": {
+    "gulp": "~3.8.11",
+    "gulp-csso": "",
+    "gulp-concat": "",
+    "gulp-uglify": ""
+  }
+}
